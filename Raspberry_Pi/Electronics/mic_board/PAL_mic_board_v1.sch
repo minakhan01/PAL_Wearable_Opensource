@@ -1,0 +1,112 @@
+EESchema Schematic File Version 4
+LIBS:PAL_mic_board_v1-cache
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Device:LED D1
+U 1 1 5DD591FD
+P 3950 2700
+F 0 "D1" H 3943 2916 50  0000 C CNN
+F 1 "LED" H 3943 2825 50  0000 C CNN
+F 2 "LED_SMD:LED_0603_1608Metric" H 3950 2700 50  0001 C CNN
+F 3 "~" H 3950 2700 50  0001 C CNN
+	1    3950 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x09 J1
+U 1 1 5DD63BC8
+P 4650 2700
+F 0 "J1" H 4730 2742 50  0000 L CNN
+F 1 "Conn_01x09" H 4730 2651 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x09_P2.54mm_Vertical" H 4650 2700 50  0001 C CNN
+F 3 "~" H 4650 2700 50  0001 C CNN
+	1    4650 2700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4250 2900 4450 2900
+Wire Wire Line
+	3800 2700 3700 2700
+Wire Wire Line
+	3700 2700 3700 2850
+Wire Wire Line
+	3700 3000 4150 3000
+Wire Wire Line
+	3500 2750 3600 2750
+Wire Wire Line
+	3600 2750 3600 2850
+Wire Wire Line
+	3600 2850 3700 2850
+Connection ~ 3700 2850
+Wire Wire Line
+	3700 2850 3700 3000
+Wire Wire Line
+	4450 2400 4150 2400
+Wire Wire Line
+	4450 2800 4350 2800
+$Comp
+L Device:R R1
+U 1 1 5DD66334
+P 3950 2250
+F 0 "R1" H 4020 2296 50  0000 L CNN
+F 1 "R" H 4020 2205 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 3880 2250 50  0001 C CNN
+F 3 "~" H 3950 2250 50  0001 C CNN
+	1    3950 2250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4250 2050 3950 2050
+Wire Wire Line
+	3950 2050 3950 2100
+Wire Wire Line
+	4250 2050 4250 2900
+Wire Wire Line
+	3950 2400 3950 2500
+Wire Wire Line
+	3950 2500 4200 2500
+Wire Wire Line
+	4200 2500 4200 2700
+Wire Wire Line
+	4200 2700 4100 2700
+$Comp
+L Switch:SW_Push SW1
+U 1 1 5DD7A616
+P 3300 2750
+F 0 "SW1" H 3300 3035 50  0000 C CNN
+F 1 "SW_Push" H 3300 2944 50  0000 C CNN
+F 2 "Button_Switch_THT:SW_PUSH_6mm" H 3300 2950 50  0001 C CNN
+F 3 "~" H 3300 2950 50  0001 C CNN
+	1    3300 2750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2950 2750 3100 2750
+Wire Wire Line
+	2950 2750 2950 3100
+Wire Wire Line
+	2950 3100 4450 3100
+Wire Wire Line
+	4350 2800 4350 3000
+Connection ~ 4350 3000
+Wire Wire Line
+	4350 3000 4450 3000
+Wire Wire Line
+	4150 2400 4150 3000
+Connection ~ 4150 3000
+Wire Wire Line
+	4150 3000 4350 3000
+$EndSCHEMATC
