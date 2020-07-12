@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>js/DataStorageManager.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DataProcessingManager.html">DataProcessingManager</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DataStorageManager.html">DataStorageManager</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#addToCache">addToCache</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#createCacheFile">createCacheFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#getCacheTable">getCacheTable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#getClassName">getClassName</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#getLatestDataCacheTable">getLatestDataCacheTable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#getLatestLog">getLatestLog</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#getNotUpdatedCacheTable">getNotUpdatedCacheTable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#getNotUploadedCacheTable">getNotUploadedCacheTable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#readCacheFile">readCacheFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#updateCacheTable">updateCacheTable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#updateFaceRelationTable">updateFaceRelationTable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#updateHeartRateCacheTable">updateHeartRateCacheTable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#updateNotUpdatedCacheTable">updateNotUpdatedCacheTable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DataStorageManager.html#updateNotUploadedCacheTable">updateNotUploadedCacheTable</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="PiStartupManager.html">PiStartupManager</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="PiStartupManager.html#createSensorStateJsonFile">createSensorStateJsonFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="PiStartupManager.html#getClassName">getClassName</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">js/DataStorageManager.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var fs = require('fs');
+let date = require('date-and-time');
+const { execSync } = require('child_process');
+
+/**
+ * The DataStorageManager keeps track of all the data moving in the program.
+ * It contains methods to maintain caches e.g. to upload data to firebase once internet is available. 
+ * It also contains methods to maintain cache's for various other data.
+ */
+class DataStorageManager{
+    /**
+     * Initializes all cacheTables
+     */
+    constructor(){
+        this.cacheTable = [];
+        this.latestActivityCacheTable = [];
+        this.notUploadedCacheTable = [];
+        this.latestDataCacheTable = [];
+        this.sessionCacheTable = [];
+        this.heartRateCacheTable = [];
+        this.habitsTable = [];
+        this.notUpdatedCacheTable = [];
+        this.interventionRecordingsList = [];
+        this.interventionSuccessTable = {};
+        this.faceRelationData = {};
+        this.locationData = {};
+
+        this.cachePath = './data/cache.json';
+        this.lastestActivityCachePath = './data/latestActivityCache.json';
+        this.notUploadedCachePath = './data/notUploadedCache.json';
+        this.latestDataCachePath = './data/latestDataCache.json';
+        this.sessionCachePath = './data/sessionCache.json';
+        this.heartRateCachePath = './data/heartRateCache.json';
+        this.habitsPath = './data/habits.json';
+        this.interventionSuccessFilePath = './data/interventionSuccess.json';
+        this.lastInterventionTimings = "./data/lastInterventionTimings.json";
+        this.faceRelationDataPath = "./data/faceRelationData.json";
+        this.locationDataPath = "./data/locationData.json";
+        this.locationTypeDataPath = "./data/locationTypeData.json";
+        this.deviceNamePath = "./data/deviceName.txt";
+        this.completeBackupPath = "./data/completeBackup.json";
+        this.notUpdatedCachePath = "./data/notUpdatedCache.json"
+
+        this.interventionRecordingDir = "./data/interventionsRecording/";
+
+        this.createCacheFile(this.cachePath);
+        this.createCacheFile(this.lastestActivityCachePath);
+        this.createCacheFile(this.notUploadedCachePath);
+        this.createCacheFile(this.latestDataCachePath);
+        this.createCacheFile(this.sessionCachePath);
+        this.createCacheFile(this.heartRateCachePath);
+        this.createCacheFile(this.habitsPath);
+        this.createCacheFile(this.interventionSuccessFilePath);
+        this.createCacheFile(this.lastInterventionTimings);
+        this.createCacheFile(this.faceRelationDataPath);
+        this.createCacheFile(this.locationDataPath);
+        this.createCacheFile(this.locationTypeDataPath);
+        this.createCacheFile(this.completeBackupPath);
+        this.createCacheFile(this.notUpdatedCachePath);
+
+        this.deviceName = fs.readFileSync(this.deviceNamePath);
+
+        this.cacheTable = this.readCacheFile(this.cachePath);
+        this.latestActivityCacheTable = this.readCacheFile(this.lastestActivityCachePath);
+        this.notUploadedCacheTable = this.readCacheFile(this.notUploadedCachePath);
+        this.latestDataCacheTable = this.readCacheFile(this.latestDataCachePath);
+        this.sessionCacheTable = this.readCacheFile(this.sessionCachePath);
+        this.heartRateCacheTable = this.readCacheFile(this.heartRateCachePath);
+        this.habitsTable = this.readCacheFile(this.habitsPath);
+        this.interventionSuccessTable = this.readCacheFile(this.interventionSuccessFilePath);
+        this.faceRelationData = this.readCacheFile(this.faceRelationDataPath);
+        this.locationData = this.readCacheFile(this.locationDataPath);
+        this.locationTypeData = this.readCacheFile(this.locationTypeDataPath);
+        this.completeBackup = this.readCacheFile(this.completeBackupPath);
+        this.notUpdatedCache = this.readCacheFile(this.notUpdatedCachePath);
+
+        this.sessionState = false;
+        this.sessionId = "";
+
+        this.interventionPlayed = false;
+        this.currentTimeStamp = "";
+        this.andOr = "";
+        this.condition1 = "";
+        this.condition2 = "";
+        this.interventionHelpful = false;
+    }
+
+    /**
+     * @returns {string} - Returns the name of the current class
+     */
+    getClassName(){
+        return "DataStorageManager";
+    }
+
+    /**
+     * Creates a JSON Cache File and writes an empty JSON to it
+     * @param {string} path - Path where file needs to be stored
+     */
+    createCacheFile(path){
+        if(!fs.existsSync(path)){
+            fs.writeFileSync(path,JSON.stringify({}));
+            console.log(this.getClassName()+" : Creating Cache File");
+        }
+    }
+
+    /**
+     * @returns {Array} - Returns main cacheTable
+     */
+    getCacheTable(){
+        return this.cacheTable;
+    }
+    
+    /**
+     * @returns {Array} - Returns the cache table which is not uploaded 
+     */
+    getNotUploadedCacheTable(){
+        return this.notUploadedCacheTable;
+    }
+
+    /**
+     * @returns {Array} - Returns the cache table which is not updated 
+     */
+    getNotUpdatedCacheTable(){
+        return this.notUpdatedCacheTable;
+    }
+
+    /**
+     * @returns {Array} - Returns the cache table containing the latest data
+     */
+    getLatestDataCacheTable(){
+        return this.latestDataCacheTable;
+    }
+    
+    /**
+     * To Update changes in the cache table and write to existing file 
+     * @param {Array} cacheTable - Array of cacheTable
+     */
+    updateCacheTable(cacheTable){
+        this.cacheTable = cacheTable;
+        fs.writeFileSync(this.cachePath, JSON.stringify(this.cacheTable));
+    }
+
+    /**
+     * To Update changes in the cache table and write to existing file 
+     * @param {Array} cacheTable - Array of cacheTable
+     */
+    updateHeartRateCacheTable(heartRateCacheTable){
+        this.heartRateCacheTable = heartRateCacheTable;
+        fs.writeFileSync(this.heartRateCachePath, JSON.stringify(this.heartRateCacheTable));
+    }
+
+    /**
+     * To Update changes in the cache table and write to existing file 
+     * @param {Array} cacheTable - Array of cacheTable
+     */
+    updateNotUploadedCacheTable(cacheTable){
+        this.notUploadedCacheTable = cacheTable;
+        fs.writeFileSync(this.notUploadedCachePath, JSON.stringify(this.notUploadedCacheTable));
+    }
+
+    /**
+     * To Update changes in the cache table and write to existing file 
+     * @param {Array} cacheTable - Array of cacheTable
+     */
+    updateNotUpdatedCacheTable(cacheTable){
+        this.notUpdatedCacheTable = cacheTable;
+        fs.writeFileSync(this.notUpdatedCachePath, JSON.stringify(this.notUpdatedCacheTable));
+    }
+
+    /**
+     * To Update changes in the cache table and write to existing file 
+     * @param {Array} cacheTable - Array of cacheTable
+     */
+    updateFaceRelationTable(cacheTable){
+        this.faceRelationData = cacheTable;
+        fs.writeFileSync(this.faceRelationDataPath, JSON.stringify(this.faceRelationData))
+    }
+
+    /**
+     * Reads Cache File from path 
+     * @param {string} - path of cache file to read
+     * @returns {JSON} - returns the contents of the cache file read
+     */
+    readCacheFile(path){
+        console.log(path);
+        var temp = fs.readFileSync(path,'utf8');
+        return JSON.parse(temp);
+    }
+
+    /**
+     * Adds Raspberry Pi log statements file to the notUploadedCache
+     */
+    getLatestLog(){
+        var new_date = new Date();
+        var mm_dd_yy = date.format(new_date,'MMM_DD_YYYY');
+        console.log(this.getClassName()+" : Getting Log Data -> "+mm_dd_yy);
+        const stdout = execSync('journalctl -u PAL.service > ./data/logs/'+mm_dd_yy+'.txt');
+        // spawn('journalctl',['-u','PAL.service','>','./data/logs/'+mm_dd_yy+'.txt']);
+        this.addToNotUploadedCache('./data/logs/'+mm_dd_yy+'.txt','logs');
+    }
+
+    /**
+     * Adds a datapoint to the exsiting cache. Checks if timestamp already exits or not
+     * @param {String} timeStamp - TimeStamp of the datapoint
+     * @param {String} field - Key Name of the data
+     * @param {String} value - the data point itself
+     */
+    addToCache(timeStamp,field,value){
+        this.getLatestLog();
+        console.log(this.getClassName()+ " : Writing "+timeStamp+", "+field+", "+value+", "+ "to Cache");
+        if(this.cacheTable.hasOwnProperty(timeStamp)){
+            this.cacheTable[timeStamp][field] = value;
+            var key = Object.keys(this.latestActivityCacheTable)[0];
+            if(key!=null){
+                this.cacheTable[timeStamp]["location"] = this.latestActivityCacheTable[key]["location"];
+                this.cacheTable[timeStamp]["placeName"] = this.latestActivityCacheTable[key]["placeName"];
+                this.cacheTable[timeStamp]["placeType"] = this.latestActivityCacheTable[key]["placeType"];
+                this.cacheTable[timeStamp]["activityExit"] = this.latestActivityCacheTable[key]["activityExit"];
+                this.cacheTable[timeStamp]["currentActivity"] = this.latestActivityCacheTable[key]["currentActivity"];
+                this.cacheTable[timeStamp]["activityConfidence"] = this.latestActivityCacheTable[key]["activityConfidence"];
+                this.cacheTable[timeStamp]["session"] = this.sessionState.toString();
+                this.cacheTable[timeStamp]["sessionId"] = this.sessionId;
+                this.cacheTable[timeStamp]["label"] = "";
+            }
+            fs.writeFileSync(this.cachePath,JSON.stringify(this.cacheTable));
+            this.addToLatestDataCache(timeStamp);
+
+            this.locationData[timeStamp] = this.latestActivityCacheTable[key]["placeName"];
+            fs.writeFileSync(this.locationDataPath,JSON.stringify(this.locationData));
+
+            this.completeBackup[timeStamp] = this.cacheTable[timeStamp];
+            fs.writeFileSync(this.completeBackupPath, JSON.stringify(this.completeBackup));
+        }
+        else{
+            this.cacheTable[timeStamp]={};
+            this.cacheTable[timeStamp][field] = value;
+            var key = Object.keys(this.latestActivityCacheTable)[0];
+            if(key!=null){
+                this.cacheTable[timeStamp]["location"] = this.latestActivityCacheTable[key]["location"];
+                this.cacheTable[timeStamp]["placeType"] = this.latestActivityCacheTable[key]["placeType"];
+                this.cacheTable[timeStamp]["placeName"] = this.latestActivityCacheTable[key]["placeName"];
+                this.cacheTable[timeStamp]["activityExit"] = this.latestActivityCacheTable[key]["activityExit"];
+                this.cacheTable[timeStamp]["currentActivity"] = this.latestActivityCacheTable[key]["currentActivity"];
+                this.cacheTable[timeStamp]["activityConfidence"] = this.latestActivityCacheTable[key]["activityConfidence"];
+                this.cacheTable[timeStamp]["session"] = this.sessionState.toString();
+                this.cacheTable[timeStamp]["sessionId"] = this.sessionId;
+                this.cacheTable[timeStamp]["label"] = "";
+            }
+            fs.writeFileSync(this.cachePath,JSON.stringify(this.cacheTable));
+            this.addToLatestDataCache(timeStamp);
+
+            this.locationData[timeStamp] = this.latestActivityCacheTable[key]["placeName"];
+            fs.writeFileSync(this.locationDataPath,JSON.stringify(this.locationData));
+
+
+            this.completeBackup[timeStamp] = this.cacheTable[timeStamp];
+            fs.writeFileSync(this.completeBackupPath, JSON.stringify(this.completeBackup));
+        }
+    }
+
+    addToLatestActivityCache(timeStamp,json){
+        console.log(this.getClassName()+ " : Writing "+timeStamp+" : " + JSON.stringify(json) + " to Cache");
+        this.latestActivityCacheTable = {};
+        this.latestActivityCacheTable[timeStamp]=json;
+        fs.writeFileSync(this.lastestActivityCachePath,JSON.stringify(this.latestActivityCacheTable));
+    }
+
+    addToNotUploadedCache(source, destination){
+        console.log(this.getClassName()+"  : Writing Source = "+source + ", Destination = "+destination+" to Not Uploaded Cache");
+        this.notUploadedCacheTable.push({source:source,destination:destination})
+        fs.writeFileSync(this.notUploadedCachePath, JSON.stringify(this.notUploadedCacheTable));
+    }
+
+    addToNotUpdatedCache(toUpdate){
+        console.log(this.getClassName() + " : " + toUpdate);
+        var timeStamp = toUpdate["timeStamp"];
+        var field = toUpdate["field"];
+        var value = toUpdate["value"];
+        console.log(this.getClassName() + " Writing timeStamp = " + timeStamp  + ", Field = ", + field + ", value = " + value +
+            " to notUpdatedCache");
+        this.notUpdatedCacheTable.push(toUpdate);
+        fs.writeFileSync(this.notUpdatedCachePath, JSON.stringify(this.notUpdatedCacheTable));
+    }
+
+    addToLatestDataCache(timeStamp){
+        this.latestDataCacheTable = {};
+        this.latestDataCacheTable[timeStamp] = this.cacheTable[timeStamp];
+        fs.writeFileSync(this.latestDataCachePath,JSON.stringify(this.latestDataCacheTable));
+    }
+
+    addToHeartRateCache(timeStamp, averageHeartRate){
+        console.log("adding to heart rate cache");
+        this.heartRateCacheTable[timeStamp] = {};
+        this.heartRateCacheTable[timeStamp]["heartRate"] = averageHeartRate;
+        console.log(this.getClassName()+ " : Writing "+timeStamp+" : " + JSON.stringify(this.heartRateCacheTable) + " to HeartRateCache");
+        fs.writeFileSync(this.heartRateCachePath, JSON.stringify(this.heartRateCacheTable));
+    }
+
+    addToLocationTypeCache(key, value){
+        console.log("adding to location type cache");
+        this.locationTypeData[key] = value;
+        console.log(this.getClassName() + " : Writing" + key + " : " + value + " to locationTypeData");
+        fs.writeFileSync(this.locationTypeDataPath, JSON.stringify(this.locationTypeData));
+    }
+
+    getHeartRateCacheTable(){
+        return this.heartRateCacheTable;
+    }
+
+    saveHabits(habitsTable){
+        console.log(this.getClassName()+" : Saving Interventions Table");
+        this.habitsTable = habitsTable;
+        fs.writeFileSync(this.habitsPath, JSON.stringify(this.habitsTable));
+    }
+
+    getHabitsTable(){
+        return this.habitsTable;
+    }
+
+    setSessionState(sessionState){
+        this.sessionState = sessionState;
+    }
+
+    getSessionState(){
+        return this.sessionState;
+    }
+
+    setSessionId(sessionId){
+        this.sessionId = sessionId;
+    }
+
+    getInterventionPlayed(){
+        return this.interventionPlayed;
+    }
+
+    setInterventionPlayed(state){
+        this.interventionPlayed = state;
+        console.log(this.getClassName()+" : Intervention Played State = "+state);
+    }
+
+    getInterventionHelpful(){
+        return this.interventionHelpful;
+    }
+
+    setInterventionHelpful(interventionHelpful){
+        this.interventionHelpful = interventionHelpful;
+    }
+
+    getConditions(){
+        return [this.condition1, this.condition2]
+    }
+
+    setConditions(condition1, condition2){
+        this.condition1 = condition1;
+        this.condition2 = condition2;
+    }
+
+    setInterventionSuccessStateAtCurrentTimeStamp(){
+        var timeStamp = this.currentTimeStamp;
+        if(this.interventionSuccessTable[timeStamp] != undefined &amp;&amp; this.interventionSuccessTable[timeStamp]["success"]==true){
+            this.setInterventionHelpful(false);
+            console.log(this.getClassName()+" : Intervention is already true at "+timeStamp);
+        }
+        else{
+            var state = this.getInterventionHelpful();
+            var conditions = this.getConditions();
+            console.log(conditions);
+            this.interventionSuccessTable[timeStamp] =
+                {"condition1": conditions[0], "condition2": conditions[1], "success": state, "andOr": this.andOr};
+            this.setInterventionHelpful(false);
+            console.log(this.getClassName()+" : Intervention Success State At "+timeStamp+" = " + state);
+        }
+        fs.writeFileSync(this.interventionSuccessFilePath,JSON.stringify(this.interventionSuccessTable));
+    }
+}
+
+module.exports = new DataStorageManager();
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Sun Jul 12 2020 12:24:41 GMT+0530 (India Standard Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
